@@ -1,0 +1,10 @@
+this is a nice hacky way to add custom text for refernces
+to enable, add the following to the .bst style file:
+
+FUNCTION {mynote}
+{ output.bibitem
+  format.note output
+  fin.entry
+}
+
+@MYNOTE{available_on_request,note="Available on request."}

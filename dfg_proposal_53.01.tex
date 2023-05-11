@@ -1,0 +1,340 @@
+\documentclass[12pt]{scrartcl}
+\usepackage[margin=2.0cm,
+            footskip=1cm
+]{geometry}
+%\usepackage{fontspec}
+%\setmainfont{Arial}
+\usepackage{setspace}
+\setstretch{1.2}
+
+\makeatletter
+\newcommand\thefontsize{The current font size is: \f@size pt}
+\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%subsubsubsection
+\DeclareNewSectionCommand[
+  style=section,
+  counterwithin=subsubsection,
+  afterskip=1.5ex plus .2ex,
+  beforeskip=3.25ex plus 1ex minus .2ex,
+  afterindent=false,
+  level=\paragraphnumdepth,
+  tocindent=10em,
+  tocnumwidth=5em
+]{subsubsubsection}
+\setcounter{secnumdepth}{\subsubsubsectionnumdepth}
+\setcounter{tocdepth}{\subparagraphtocdepth}
+
+\RedeclareSectionCommands[
+  level=\numexpr\subsubsubsectionnumdepth+1\relax,
+  toclevel=\numexpr\subsubsubsectiontocdepth+1\relax,
+  increaselevel
+]{paragraph,subparagraph}
+\RedeclareSectionCommand[
+  counterwithin=subsubsubsection,
+  tocindent=12em,
+  tocnumwidth=6em
+]{paragraph}
+\RedeclareSectionCommand[
+  tocindent=14em,
+  tocnumwidth=7em
+]{subparagraph}
+%%%subsubsubsection
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+\usepackage{layouts}
+\usepackage{graphicx}
+\usepackage{wrapfig}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage[%
+format=plain,%
+font=it,%
+labelfont=bf, %
+labelsep=endash, %
+% indention=.4cm
+]{caption}
+\usepackage{multicol}
+\usepackage{scrlayer-scrpage}
+\usepackage{url}
+
+\usepackage[official]{eurosym}
+\usepackage[normalem]{ulem}
+\usepackage{siunitx}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% bibliography with custom bibLaTex
+% Font at least 9pt
+% include DOI/URL if available
+% preferably with titles
+\usepackage[%
+% bibstyle from physics
+bibstyle=phys,
+articletitle=false, biblabel=brackets,%
+chaptertitle=false, pageranges=false,%
+maxbibnames=3,
+%doi=true,
+% separate citation style (avoid compressed lists)
+citestyle=numeric, sortcites=true, sorting=none,%
+backend=biber%
+]
+{biblatex}
+%\renewcommand*{\bibfont}{\normalfont\normalsize\bfseries}
+\setlength\bibitemsep{0.2\itemsep}
+%\renewcommand*{\bibfont}{\footnotesize}
+%\renewcommand*{\bibfont}{\fontsize{10}{11}\selectfont}
+\renewcommand*{\bibfont}{\fontsize{9.3}{10.5}\selectfont}
+%\renewcommand*{\bibfont}{\fontsize{9}{10.5}\selectfont}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% general
+\DeclareFieldFormat[article]{volume}{#1}
+\DeclareFieldFormat{journaltitle}{#1,} % normal journal title
+\setlength{\biblabelsep}{\labelsep} % save some space
+\DeclareFieldFormat[article]{year}{(#1).}
+\DefineBibliographyStrings{english}{%
+  byeditor  = ed.}
+% formatting of books
+\renewbibmacro*{series+number}{%
+}
+\DeclareFieldFormat[book]{year}{#1}
+\DeclareFieldFormat[incollection]{year}{#1}
+\renewbibmacro*{publisher+location+date}{%
+  \setunit{\addspace}%
+  \printtext[parens]{%
+    \printlist{publisher}%
+    %\newunit
+    %\printlist{location}%
+    \newunit
+    %\usebibmacro{date}%
+    \printfield{year}%
+  }%
+  \newunit
+}
+\DeclareFieldFormat[book]{volume}{}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% highlights & preprints
+\DeclareBibliographyCategory{highlights}
+\DeclareFieldFormat{labelnumberwidth}{\mkbibbrackets{\ifcategory{highlights}{\mkbibbold{#1}}{#1}}}
+\AtEveryBibitem{
+    %special formating for highlights (bold)
+    \ifcategory{highlights}{
+        \renewbibmacro*{begentry}{\bfseries\frenchspacing}
+    }{}
+    % special formating for arxiv
+    \iffieldequalstr{eprinttype}{arxiv}{
+        \DeclareFieldFormat{title}{} % remove title
+        \DeclareFieldFormat{eprint}{%
+            arXiv,
+            \setunit*{\addcomma\space}%
+            #1%
+        }
+        \renewbibmacro*{organization+location+date}{
+            %\printfield{number}
+            \printfield{eprint}
+            \printfield{year}
+        }
+    }{}
+    % TODO: special formating for Zenodo
+    % to avoid eLife information on editors
+    \iffieldequalstr{pubtype}{article}{
+        \renewbibmacro*{byeditor+others}{}
+    }
+}
+% make citation bold (requies to not compress!)
+\DeclareFieldFormat{boldhighlight}{\ifcategory{highlights}{\mkbibbold{#1}}{#1}}
+\renewbibmacro*{cite}{%
+  \printtext[bibhyperref]{%
+    \printtext[boldhighlight]{%
+      \printfield{labelprefix}%
+      \printfield{labelnumber}%
+      \ifbool{bbx:subentry}
+        {\printfield{entrysetcount}}
+        {}}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%% bibliography
+\addbibresource{./references.bib}
+\addbibresource{./notes.bib}
+%%%%%%%%%%%%%%%%%%%%%%%%%% up to 10 highlights
+\addtocategory{highlights}{%
+zierenberg_homeostatic_2018,%
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\RedeclareSectionCommand[
+  beforeskip=\baselineskip,
+  afterskip=.5\baselineskip]{section}
+
+\newcommand{\rom}[1]{\uppercase\expandafter{\romannumeral #1\relax}}
+\newcommand\blfootnote[1]{%
+  \begingroup
+  \renewcommand\thefootnote{}\footnote{#1}%
+  \addtocounter{footnote}{-1}%
+  \endgroup
+}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% document
+\begin{document}
+\thispagestyle{plain}
+\mbox{ }
+
+\vspace{-1cm}
+\noindent
+\textbf{\large
+  Project Description --- Project Proposals
+}
+
+\vspace{0.5cm}
+\noindent
+\textbf{\large
+  Johannes Zierenberg, G\"ottingen
+}
+
+\vspace{0.5cm}
+\noindent
+\textbf{\large
+ Project title
+}
+\\
+%\textbf{Subject area:} 310 (Statistical Physics, Soft Matter, Biological Physics, Nonlinear Dynamics)\\
+%\textbf{Host organization:} University of G\"ottingen
+\vspace{-0.5cm}
+\noindent\makebox[\linewidth]{\rule{\textwidth}{0.4pt}}
+
+
+\section*{Project Description}
+% Sections 1-3 must not exceed 17 pages in total.
+
+\section{Starting Point}
+\subsection*{State of the art and preliminary work}
+When referencing, we here cite work by others~\cite{author_2023} as usual and highlight own works~\cite{zierenberg_homeostatic_2018} in bold.
+We can also combine this~\cite{author_2023, zierenberg_homeostatic_2018}.
+
+%currently not working
+%Or include custom notes~\cite{available_on_request}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Objectives and work programme
+\section{Objectives and work programme}
+
+\subsection{Anticipated total duration of the project}
+
+\subsection{Objectives}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% Objectives and work programme
+\subsection{Work programme including proposed research methods}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Handling of research data}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Relevance of sex, gender and/or diversity}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Project- and subject-related list of publications}
+%Highlighted own works are marked bold.
+\vspace{-0.5cm}
+\begingroup
+\begin{multicols}{2}
+\setlength{\parskip}{\bibitemsep}%
+\renewcommand{\section}[2]{}
+\printbibliography
+\end{multicols}
+\endgroup
+
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%not more than 10 pages (16-26)
+\section{Supplementary information on the research context}
+
+\subsection{Ethical and/or legal aspects of the project}
+
+\subsubsection{General ethical aspects}
+
+\subsubsection{Descriptions of proposed investigations involving experiments on humans or human materials}
+
+\subsubsection{Descriptions of proposed investigations involving experiments on animals}
+
+\subsubsection{Descriptions of projects involving genetic resources (or associated traditional knowledge) from a foreign country}
+
+\subsubsection{Explanations regarding any possible safety-related aspects (``Dual Use Research of Concern''; foreign trade law)}
+
+
+%\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Employment status information}
+Zierenberg, Johannes, Dr. rer. nat.\\
+Postdoctoral Researcher\\
+Max Planck Institute for Dynamics and Self-Organization\\
+Am Fassberg 17\\
+37077 G\"ottingen\\
+fixed-term position until 31.12.2023
+
+\subsection{First-time proposal data}
+
+\subsection{Composition of the project group}
+
+\subsection{Researchers in Germany with whom you have agreed to cooperate on this project}
+
+\subsection{Researchers abroad with whom you have agreed to cooperate on this project}
+
+\subsection{Researchers with whom you have collaborated scientifically within the past three years}
+
+\subsection{Project-relevant cooperation with commercial enterprises}
+
+\subsection{Project-relevant participation in commercial enterprises}
+
+\subsection{Scientific equipment}
+
+\subsection{Other submissions}
+
+\subsection{Other Information}
+
+
+\newpage
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Requested modules/funds}
+For a successful outcome of the research project, I apply for the following
+modules/funds.
+\subsection{Basic Module}
+\subsubsection{Funding for Staff}
+\begin{description}[labelindent=1cm]
+    \item[Person (X\euro):] Explanation
+\end{description}
+
+\subsubsection{Direct Project Costs}
+
+\subsubsubsection{Equipment up to € 10,000, Software and Consumables}
+
+\subsubsubsection{Travel Expenses}
+
+\subsubsubsection{Visiting Researchers}
+
+\subsubsubsection{Expenses for Laboratory Animals}
+
+\subsubsubsection{Other Costs}
+
+\subsubsubsection{Project-related Publication Expenses}
+
+\subsubsection{Instrumentation}
+\subsubsubsection{Equipment exceeding € 10,000}
+
+\subsubsubsection{Major Instrumentation exceeding € 50,000}
+
+%\subsection{Module Temporary Clinician Substitute}
+%\subsection{Module Mercator Fellows}
+%\subsection{Module Workshop Funding}
+
+%\subsection{Module Public Relations Funding}
+%\subsection{Module Family Allowance
+\end{document}
+
